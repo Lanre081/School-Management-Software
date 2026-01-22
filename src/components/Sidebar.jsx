@@ -4,11 +4,11 @@ import { useAuth } from '../context/AuthContext';
 import {
     LayoutDashboard, Users, BookOpen, Calendar,
     FileText, Settings, DollarSign, Bell, FileBarChart,
-    MessageSquare, Clock
+    MessageSquare, Clock, X
 } from 'lucide-react';
 import clsx from 'clsx';
 
-const Sidebar = () => {
+const Sidebar = ({ isOpen, onClose }) => {
     const { user } = useAuth();
 
     if (!user) return null;
@@ -70,48 +70,78 @@ const Sidebar = () => {
     const menuItems = getMenuItems();
 
     return (
-        <aside className="w-64 bg-brown-900 border-r border-brown-800 h-[calc(100vh-64px)] overflow-y-auto hidden md:block shadow-xl">
-            <div className="p-4">
-                {/* Role Badge */}
-                <div className="mb-6 p-3 bg-brown-800/50 rounded-xl border border-brown-700 backdrop-blur-sm">
-                    <p className="text-xs font-semibold text-cream-300 uppercase tracking-wider mb-1">Current Role</p>
-                    <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
-                        <p className="text-lg font-bold text-white capitalize">{role}</p>
+        <>
+            {/* Mobile Overlay */}
+            {isOpen && (
+                <div
+                    className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] md:hidden transition-opacity"
+                    onClick={onClose}
+                />
+            )}
+
+            <aside className={clsx(
+                "fixed md:sticky top-[64px] left-0 md:top-0 z-[70] md:z-auto w-64 bg-brown-900 border-r border-brown-800 h-[calc(100vh-64px)] overflow-y-auto transition-transform duration-300 md:translate-x-0 md:block shadow-xl shrink-0",
+                isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+            )}>
+                <div className="p-4">
+                    {/* Role Badge with Close Button on Mobile */}
+                    <div className="mb-6 p-4 bg-brown-800/50 rounded-2xl border border-brown-700 backdrop-blur-sm relative group overflow-hidden">
+                        <div className="absolute top-0 right-0 w-24 h-24 bg-primary/10 rounded-full blur-2xl -mr-10 -mt-10 group-hover:bg-primary/20 transition-all"></div>
+
+                        <div className="flex justify-between items-start mb-2 relative z-10">
+                            <div>
+                                <p className="text-[10px] font-bold text-cream-300 uppercase tracking-[0.2em] mb-1 opacity-80">Access Level</p>
+                                <div className="flex items-center gap-2">
+                                    <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)] animate-pulse"></div>
+                                    <p className="text-xl font-black text-white capitalize leading-tight">{role}</p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={onClose}
+                                className="md:hidden p-1.5 hover:bg-white/10 rounded-lg text-cream-200 transition-colors"
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Menu Items */}
+                    <div className="flex flex-col gap-2">
+                        {menuItems.map((item, index) => (
+                            <NavLink
+                                key={index}
+                                to={item.path}
+                                onClick={() => { if (window.innerWidth < 768) onClose(); }}
+                                end={item.path === `/${role}`}
+                                className={({ isActive }) => clsx(
+                                    "flex items-center gap-3.5 px-4 py-3.5 rounded-2xl transition-all duration-300 font-bold group relative overflow-hidden",
+                                    isActive
+                                        ? "bg-cream-100 text-brown-900 shadow-xl shadow-black/20 translate-x-1"
+                                        : "text-cream-200/70 hover:bg-brown-800/80 hover:text-white hover:translate-x-1"
+                                )}
+                            >
+                                {({ isActive }) => (
+                                    <>
+                                        {isActive && (
+                                            <div className="absolute inset-y-2 left-0 w-1 bg-primary rounded-r-full"></div>
+                                        )}
+                                        <item.icon size={20} className={clsx(
+                                            "transition-all duration-300",
+                                            isActive ? "scale-110 text-primary drop-shadow-sm" : "group-hover:scale-110 opacity-60 group-hover:opacity-100"
+                                        )} />
+                                        <span className="flex-1 tracking-wide text-sm">{item.label}</span>
+                                        {isActive && (
+                                            <div className="w-1.5 h-1.5 bg-primary rounded-full shadow-[0_0_8px_rgba(var(--primary-rgb),0.4)]"></div>
+                                        )}
+                                    </>
+                                )}
+                            </NavLink>
+                        ))}
                     </div>
                 </div>
-
-                {/* Menu Items */}
-                <div className="flex flex-col gap-1.5">
-                    {menuItems.map((item, index) => (
-                        <NavLink
-                            key={index}
-                            to={item.path}
-                            end={item.path === `/${role}`}
-                            className={({ isActive }) => clsx(
-                                "flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 font-medium group relative",
-                                isActive
-                                    ? "bg-cream-100 text-brown-900 shadow-lg shadow-black/10 translate-x-1"
-                                    : "text-cream-200 hover:bg-brown-800 hover:text-white hover:pl-5"
-                            )}
-                        >
-                            {({ isActive }) => (
-                                <>
-                                    <item.icon size={20} className={clsx(
-                                        "transition-transform duration-300",
-                                        isActive ? "scale-110 text-brown-600" : "group-hover:scale-110 opacity-70 group-hover:opacity-100"
-                                    )} />
-                                    <span className="flex-1 tracking-wide text-sm">{item.label}</span>
-                                    {isActive && (
-                                        <div className="w-1.5 h-1.5 bg-brown-600 rounded-full"></div>
-                                    )}
-                                </>
-                            )}
-                        </NavLink>
-                    ))}
-                </div>
-            </div>
-        </aside>
+            </aside>
+        </>
     );
 };
+
 export default Sidebar;

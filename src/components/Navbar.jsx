@@ -1,9 +1,9 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LogOut, User, GraduationCap } from 'lucide-react';
+import { LogOut, User, GraduationCap, Menu } from 'lucide-react';
 
-const Navbar = () => {
+const Navbar = ({ onMenuClick }) => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
 
@@ -15,15 +15,28 @@ const Navbar = () => {
     return (
         <nav className="bg-brown-900 text-cream-100 px-4 sm:px-6 lg:px-8 py-4 shadow-lg sticky top-0 z-50 backdrop-blur-md border-b border-brown-800">
             <div className="max-w-7xl mx-auto flex justify-between items-center">
-                {/* Logo */}
-                <Link to="/" className="flex items-center gap-3 group">
-                    <div className="w-10 h-10 bg-cream rounded-full flex items-center justify-center shadow-md group-hover:shadow-lg transition-all group-hover:scale-110">
-                        <GraduationCap className="text-primary" size={24} />
-                    </div>
-                    <span className="text-2xl font-bold tracking-wide hidden sm:block group-hover:text-cream transition-colors">
-                        Eduservice
-                    </span>
-                </Link>
+                <div className="flex items-center gap-4">
+                    {/* Mobile Menu Button */}
+                    {user && (
+                        <button
+                            onClick={onMenuClick}
+                            className="p-2 hover:bg-white/10 rounded-lg md:hidden transition-all"
+                            aria-label="Toggle Menu"
+                        >
+                            <Menu size={24} />
+                        </button>
+                    )}
+
+                    {/* Logo */}
+                    <Link to="/" className="flex items-center gap-3 group">
+                        <div className="w-10 h-10 bg-cream rounded-full flex items-center justify-center shadow-md group-hover:shadow-lg transition-all group-hover:scale-110">
+                            <GraduationCap className="text-primary" size={24} />
+                        </div>
+                        <span className="text-2xl font-bold tracking-wide hidden sm:block group-hover:text-cream transition-colors">
+                            Eduservice
+                        </span>
+                    </Link>
+                </div>
 
                 {/* Navigation Links */}
                 <div className="flex items-center gap-4 sm:gap-6">
