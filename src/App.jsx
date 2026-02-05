@@ -31,6 +31,7 @@ import StudentAttendance from './pages/student/StudentAttendance';
 import StudentMaterials from './pages/student/StudentMaterials';
 import StudentAnnouncements from './pages/student/StudentAnnouncements';
 import StudentReports from './pages/student/StudentReports';
+import StudentCbtList from './pages/student/StudentCbtList';
 import ParentDashboard from './pages/parent/ParentDashboard';
 import ParentFees from './pages/parent/ParentFees';
 import ParentMessages from './pages/parent/ParentMessages';
@@ -38,6 +39,7 @@ import ParentAnnouncements from './pages/parent/ParentAnnouncements';
 import ParentCalendar from './pages/parent/ParentCalendar';
 import Placeholder from './components/Placeholder';
 import ProtectedRoute from './components/ProtectedRoute';
+import CbtExam from './pages/student/CbtExam';
 import { AuthProvider } from './context/AuthContext';
 
 function App() {
@@ -108,6 +110,7 @@ function App() {
           <Route path="materials" element={<StudentMaterials />} />
           <Route path="announcements" element={<StudentAnnouncements />} />
           <Route path="reports" element={<StudentReports />} />
+          <Route path="cbt" element={<StudentCbtList />} />
           <Route path="*" element={<Placeholder />} />
         </Route>
 
@@ -127,6 +130,16 @@ function App() {
           <Route path="calendar" element={<ParentCalendar />} />
           <Route path="*" element={<Placeholder />} />
         </Route>
+
+        {/* Distraction-free CBT Exam Route */}
+        <Route
+          path="/student/exam/:examId"
+          element={
+            <ProtectedRoute allowedRoles={['student']}>
+              <CbtExam />
+            </ProtectedRoute>
+          }
+        />
 
       </Routes>
     </AuthProvider>

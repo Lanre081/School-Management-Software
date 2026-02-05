@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import {
     LayoutDashboard, Users, BookOpen, Calendar,
     FileText, Settings, DollarSign, Bell, FileBarChart,
-    MessageSquare, Clock, X
+    MessageSquare, Clock, X, Layout, Monitor
 } from 'lucide-react';
 import clsx from 'clsx';
 
@@ -47,6 +47,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                 return [
                     { icon: LayoutDashboard, label: 'Dashboard', path: '/student' },
                     { icon: FileText, label: 'My Grades', path: '/student/grades' },
+                    { icon: Layout, label: 'CBT Exams', path: '/student/cbt' },
                     { icon: Calendar, label: 'Attendance', path: '/student/attendance' },
                     { icon: Clock, label: 'Timetable', path: '/student/timetable' },
                     { icon: FileText, label: 'Assignments', path: '/student/assignments' },

@@ -1,18 +1,39 @@
 import React, { useState } from 'react';
 import Table from '../../components/Table';
 import Modal from '../../components/Modal';
-import { Plus, Award, Edit, Printer, Share2, ArrowLeft, Filter, BookOpen } from 'lucide-react';
+import CbtQuestionEditor from '../../components/CbtQuestionEditor';
+import clsx from 'clsx';
+import {
+    Plus, Award, Edit, Printer, Share2, ArrowLeft,
+    Filter, BookOpen, Clock, Settings2, Save, Eye,
+    Monitor, FileText
+} from 'lucide-react';
 
 const ExamManagement = () => {
     const [activeTab, setActiveTab] = useState('schedule');
     const [selectedExam, setSelectedExam] = useState(null);
     const [selectedProgram, setSelectedProgram] = useState('Western'); // 'Western', 'Arabic', 'Quran'
 
-    // Mock Data for Exams: Added 'program' field
+    // Mock Data for Exams: Added 'program' field and CBT meta
     const [exams, setExams] = useState([
-        { id: 1, name: 'First Term Mathematics', session: '2025/2026', term: 'First Term', subject: 'Mathematics', class: 'JSS 1', program: 'Western', date: '2025-12-10', status: 'Scheduled', published: false },
-        { id: 2, name: 'First Term Nahw', session: '2025/2026', term: 'First Term', subject: 'Nahw (Grammar)', class: 'Aliyah 1', program: 'Arabic', date: '2025-12-11', status: 'Scheduled', published: false },
-        { id: 3, name: 'Hifz Assessment', session: '2025/2026', term: 'First Term', subject: 'Hifz (Memorization)', class: 'Tahfeez 1', program: 'Quran', date: '2025-12-12', status: 'Scheduled', published: false },
+        {
+            id: 1, name: 'First Term Mathematics', session: '2025/2026', term: 'First Term',
+            subject: 'Mathematics', class: 'JSS 1', program: 'Western', date: '2025-12-10',
+            status: 'Scheduled', published: false, type: 'CBT', duration: 40,
+            visibility: 'immediate', questions: []
+        },
+        {
+            id: 2, name: 'First Term Nahw', session: '2025/2026', term: 'First Term',
+            subject: 'Nahw (Grammar)', class: 'Aliyah 1', program: 'Arabic', date: '2025-12-11',
+            status: 'Scheduled', published: false, type: 'Theory', duration: 120,
+            visibility: 'delayed', questions: []
+        },
+        {
+            id: 3, name: 'Hifz Assessment', session: '2025/2026', term: 'First Term',
+            subject: 'Hifz (Memorization)', class: 'Tahfeez 1', program: 'Quran', date: '2025-12-12',
+            status: 'Scheduled', published: false, type: 'Manual', duration: 60,
+            visibility: 'hidden', questions: []
+        },
     ]);
 
     // Mock Students for Marks Entry (Differentiated by programs in real app)
@@ -27,7 +48,9 @@ const ExamManagement = () => {
     const [currentReportStudent, setCurrentReportStudent] = useState(null);
 
     const [examForm, setExamForm] = useState({
-        name: '', session: '2025/2026', term: 'First Term', subject: '', class: '', program: 'Western', date: '', status: 'Scheduled'
+        name: '', session: '2025/2026', term: 'First Term', subject: '', class: '',
+        program: 'Western', date: '', status: 'Scheduled', type: 'CBT', duration: 40,
+        visibility: 'immediate'
     });
 
     // Helper to calculate Grade
@@ -148,15 +171,53 @@ const ExamManagement = () => {
                 <div className="bg-white rounded-xl shadow-sm border border-brown-200 overflow-hidden">
                     <Table
                         columns={[
-                            { header: 'Subject / Exam', accessor: 'name', render: (row) => <div><p className="font-bold text-brown-900">{row.subject}</p><p className="text-xs text-brown-500">{row.name}</p></div> },
-                            { header: 'Program', accessor: 'program', render: (row) => <span className="px-2 py-1 bg-cream-200 rounded text-xs font-bold text-brown-700">{row.program}</span> },
+                            {
+                                header: 'Subject / Exam', accessor: 'name', render: (row) => (
+                                    <div className="flex items-center gap-3">
+                                        <div className={clsx(
+                                            "p-2 rounded-lg",
+                                            row.type === 'CBT' ? "bg-purple-50 text-purple-600" : "bg-blue-50 text-blue-600"
+                                        )}>
+                                            {row.type === 'CBT' ? <Monitor size={18} /> : <FileText size={18} />}
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-brown-900">{row.subject}</p>
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-[10px] bg-brown-100 text-brown-600 px-1.5 py-0.5 rounded font-black uppercase">{row.type}</span>
+                                                <p className="text-xs text-brown-500">{row.name}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )
+                            },
+                            {
+                                header: 'Settings', accessor: 'duration', render: (row) => (
+                                    <div className="space-y-1">
+                                        <div className="flex items-center gap-1.5 text-xs font-bold text-brown-600">
+                                            <Clock size={12} /> {row.duration} mins
+                                        </div>
+                                        <div className="flex items-center gap-1.5 text-[10px] font-black uppercase text-primary-light">
+                                            <Eye size={10} /> {row.visibility}
+                                        </div>
+                                    </div>
+                                )
+                            },
                             { header: 'Class', accessor: 'class' },
                             { header: 'Date', accessor: 'date' },
                             { header: 'Status', accessor: 'status', render: (r) => <span className={`px-3 py-1 rounded-full text-xs font-bold ${r.published ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>{r.published ? 'Published' : r.status}</span> },
                             {
                                 header: 'Actions', accessor: 'actions', render: (row) => (
                                     <div className="flex gap-2">
-                                        <button onClick={() => { setSelectedExam(row); setActiveTab('entry'); }} className="px-3 py-1.5 bg-cream-100 text-primary hover:bg-cream-200 rounded-lg text-xs font-bold flex items-center gap-1 border border-brown-200"><Edit size={14} /> Input Scores</button>
+                                        {row.type === 'CBT' ? (
+                                            <button
+                                                onClick={() => { setSelectedExam(row); setActiveTab('questions'); }}
+                                                className="px-3 py-1.5 bg-purple-50 text-purple-700 hover:bg-purple-100 rounded-lg text-xs font-bold flex items-center gap-1 border border-purple-200"
+                                            >
+                                                <Settings2 size={14} /> Questions
+                                            </button>
+                                        ) : (
+                                            <button onClick={() => { setSelectedExam(row); setActiveTab('entry'); }} className="px-3 py-1.5 bg-cream-100 text-primary hover:bg-cream-200 rounded-lg text-xs font-bold flex items-center gap-1 border border-brown-200"><Edit size={14} /> Input Scores</button>
+                                        )}
                                         {!row.published && row.status === 'Completed' && <button onClick={() => handlePublish(row.id)} className="p-1.5 text-brown-600 hover:bg-cream-100 rounded-lg border border-transparent hover:border-brown-200" title="Publish"><Share2 size={18} /></button>}
                                     </div>
                                 )
@@ -166,6 +227,18 @@ const ExamManagement = () => {
                         actions={false}
                     />
                 </div>
+            )}
+
+            {activeTab === 'questions' && selectedExam && (
+                <CbtQuestionEditor
+                    exam={selectedExam}
+                    onBack={() => setActiveTab('schedule')}
+                    onSave={(updatedQuestions) => {
+                        setExams(exams.map(e => e.id === selectedExam.id ? { ...e, questions: updatedQuestions } : e));
+                        setActiveTab('schedule');
+                        alert('Question Bank saved successfully!');
+                    }}
+                />
             )}
 
             {activeTab === 'entry' && selectedExam && (
@@ -268,10 +341,30 @@ const ExamManagement = () => {
                             <option value="Quran">Quran Memorization</option>
                         </select>
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-brown-700 mb-1">Exam Title</label>
-                        <input className="w-full p-2.5 border border-brown-200 rounded-lg outline-none focus:ring-2 focus:ring-primary/20" placeholder="e.g. End of Term" value={examForm.name} onChange={e => setExamForm({ ...examForm, name: e.target.value })} />
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-brown-700 mb-1">Exam Type</label>
+                            <select className="w-full p-2.5 bg-white border border-brown-200 rounded-lg outline-none focus:ring-2 focus:ring-primary/20" value={examForm.type} onChange={e => setExamForm({ ...examForm, type: e.target.value })}>
+                                <option value="CBT">CBT (Auto-Marked)</option>
+                                <option value="Theory">Theory/Manual</option>
+                                <option value="Oral">Oral Assessment</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-brown-700 mb-1">Duration (Mins)</label>
+                            <input type="number" className="w-full p-2.5 border border-brown-200 rounded-lg outline-none focus:ring-2 focus:ring-primary/20" value={examForm.duration} onChange={e => setExamForm({ ...examForm, duration: e.target.value })} />
+                        </div>
                     </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-brown-700 mb-1">Result Visibility</label>
+                        <select className="w-full p-2.5 bg-white border border-brown-200 rounded-lg outline-none focus:ring-2 focus:ring-primary/20" value={examForm.visibility} onChange={e => setExamForm({ ...examForm, visibility: e.target.value })}>
+                            <option value="immediate">Immediate (Show score after submit)</option>
+                            <option value="delayed">Delayed (Release later by admin)</option>
+                            <option value="hidden">Hidden (Admins only)</option>
+                        </select>
+                    </div>
+
                     <div className="grid grid-cols-2 gap-4">
                         <div><label className="block text-sm font-medium text-brown-700 mb-1">Subject</label><input className="w-full p-2.5 border border-brown-200 rounded-lg outline-none focus:ring-2 focus:ring-primary/20" value={examForm.subject} onChange={e => setExamForm({ ...examForm, subject: e.target.value })} /></div>
                         <div><label className="block text-sm font-medium text-brown-700 mb-1">Class</label><input className="w-full p-2.5 border border-brown-200 rounded-lg outline-none focus:ring-2 focus:ring-primary/20" value={examForm.class} onChange={e => setExamForm({ ...examForm, class: e.target.value })} /></div>
