@@ -232,11 +232,12 @@ const ExamManagement = () => {
             {activeTab === 'questions' && selectedExam && (
                 <CbtQuestionEditor
                     exam={selectedExam}
+                    userRole="admin"
                     onBack={() => setActiveTab('schedule')}
                     onSave={(updatedQuestions) => {
                         setExams(exams.map(e => e.id === selectedExam.id ? { ...e, questions: updatedQuestions } : e));
+                        alert('Question Bank reviews saved!');
                         setActiveTab('schedule');
-                        alert('Question Bank saved successfully!');
                     }}
                 />
             )}

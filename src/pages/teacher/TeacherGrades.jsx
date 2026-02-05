@@ -178,9 +178,13 @@ const TeacherGrades = () => {
             {activeTab === 'questions' && selectedExam && (
                 <CbtQuestionEditor
                     exam={selectedExam}
+                    userRole="teacher"
                     onBack={() => setActiveTab('schedule')}
-                    onSave={() => {
-                        alert('Questions saved successfully!');
+                    onSave={(updatedQuestions) => {
+                        // In a real app, this would update the backend
+                        const updatedExams = exams.map(e => e.id === selectedExam.id ? { ...e, questions: updatedQuestions } : e);
+                        setExams(updatedExams);
+                        alert('Question Bank updated successfully!');
                         setActiveTab('schedule');
                     }}
                 />
