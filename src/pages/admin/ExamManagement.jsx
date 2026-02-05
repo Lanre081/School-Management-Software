@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useExams } from '../../context/ExamContext';
 import Table from '../../components/Table';
 import Modal from '../../components/Modal';
 import CbtQuestionEditor from '../../components/CbtQuestionEditor';
@@ -10,31 +11,12 @@ import {
 } from 'lucide-react';
 
 const ExamManagement = () => {
+    const { exams, addExam, updateExam } = useExams();
     const [activeTab, setActiveTab] = useState('schedule');
     const [selectedExam, setSelectedExam] = useState(null);
     const [selectedProgram, setSelectedProgram] = useState('Western'); // 'Western', 'Arabic', 'Quran'
 
-    // Mock Data for Exams: Added 'program' field and CBT meta
-    const [exams, setExams] = useState([
-        {
-            id: 1, name: 'First Term Mathematics', session: '2025/2026', term: 'First Term',
-            subject: 'Mathematics', class: 'JSS 1', program: 'Western', date: '2025-12-10',
-            status: 'Scheduled', published: false, type: 'CBT', duration: 40,
-            visibility: 'immediate', questions: []
-        },
-        {
-            id: 2, name: 'First Term Nahw', session: '2025/2026', term: 'First Term',
-            subject: 'Nahw (Grammar)', class: 'Aliyah 1', program: 'Arabic', date: '2025-12-11',
-            status: 'Scheduled', published: false, type: 'Theory', duration: 120,
-            visibility: 'delayed', questions: []
-        },
-        {
-            id: 3, name: 'Hifz Assessment', session: '2025/2026', term: 'First Term',
-            subject: 'Hifz (Memorization)', class: 'Tahfeez 1', program: 'Quran', date: '2025-12-12',
-            status: 'Scheduled', published: false, type: 'Manual', duration: 60,
-            visibility: 'hidden', questions: []
-        },
-    ]);
+    // Mock Data for Student Marks (Kept local for now as it's not the focus)
 
     // Mock Students for Marks Entry (Differentiated by programs in real app)
     const [studentMarks, setStudentMarks] = useState([
@@ -104,14 +86,13 @@ const ExamManagement = () => {
 
     const handleSaveExam = (e) => {
         e.preventDefault();
-        setExams([...exams, { ...examForm, id: Date.now(), published: false }]);
+        addExam({ ...examForm, session: '2025/2026', term: 'First Term', published: false, status: 'Scheduled' });
         setIsExamModalOpen(false);
     };
 
     const handlePublish = (examId) => {
-        if (window.confirm('Publish results to student/parent dashboards?')) {
-            setExams(exams.map(e => e.id === examId ? { ...e, published: true, status: 'Completed' } : e));
-        }
+        updateExam(examId, { published: true, status: 'Active' });
+        alert('Exam Results Published Successfully');
     };
 
     const filteredExams = exams.filter(e => selectedProgram === 'All' || e.program === selectedProgram);
@@ -235,7 +216,7 @@ const ExamManagement = () => {
                     userRole="admin"
                     onBack={() => setActiveTab('schedule')}
                     onSave={(updatedQuestions) => {
-                        setExams(exams.map(e => e.id === selectedExam.id ? { ...e, questions: updatedQuestions } : e));
+                        updateExam(selectedExam.id, { questions: updatedQuestions });
                         alert('Question Bank reviews saved!');
                         setActiveTab('schedule');
                     }}

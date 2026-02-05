@@ -4,9 +4,10 @@ import Modal from '../../components/Modal';
 import Table from '../../components/Table';
 import CbtQuestionEditor from '../../components/CbtQuestionEditor';
 import clsx from 'clsx';
+import { useExams } from '../../context/ExamContext';
 
 const TeacherGrades = () => {
-
+    const { exams, addExam, updateExam } = useExams();
     const [activeTab, setActiveTab] = useState('schedule');
     const [selectedExam, setSelectedExam] = useState(null);
     const [showExamModal, setShowExamModal] = useState(false);
@@ -17,21 +18,9 @@ const TeacherGrades = () => {
     const [showReportModal, setShowReportModal] = useState(false);
     const [currentReport, setCurrentReport] = useState(null);
 
-    // Mock Data for Teacher's Exams
-    const [exams, setExams] = useState([
-        {
-            id: 1, name: 'First Term Quiz', subject: 'Mathematics', class: 'JSS 1',
-            date: '2025-11-20', status: 'Completed', type: 'CBT', duration: 20,
-            visibility: 'immediate', questions: [
-                { id: 1, text: '2+2?', options: ['3', '4', '5', '6'], correctAnswer: '4', type: 'mcq' }
-            ]
-        },
-        {
-            id: 2, name: 'Mid-Term Assessment', subject: 'Mathematics', class: 'JSS 1',
-            date: '2025-12-05', status: 'Scheduled', type: 'Theory', duration: 120,
-            visibility: 'delayed', questions: []
-        },
-    ]);
+    // Filter exams for just this teacher (Mock: All exams)
+    // In real app: const teacherExams = exams.filter(e => e.teacherId === currentUserId)
+    const teacherExams = exams;
 
     const [students, setStudents] = useState([
         { id: 1, name: 'John Smith', admissionNo: 'ADM-001', test1: 14, test2: 13, exam: 60, total: 87, grade: 'A', remark: 'Excellent' },
@@ -112,7 +101,7 @@ const TeacherGrades = () => {
             {activeTab === 'schedule' && (
                 <div className="bg-white rounded-2xl shadow-sm border border-brown-200 overflow-hidden">
                     <Table
-                        data={exams}
+                        data={teacherExams}
                         columns={[
                             {
                                 header: 'Subject / Exam', accessor: 'name', render: (row) => (
@@ -181,9 +170,7 @@ const TeacherGrades = () => {
                     userRole="teacher"
                     onBack={() => setActiveTab('schedule')}
                     onSave={(updatedQuestions) => {
-                        // In a real app, this would update the backend
-                        const updatedExams = exams.map(e => e.id === selectedExam.id ? { ...e, questions: updatedQuestions } : e);
-                        setExams(updatedExams);
+                        updateExam(selectedExam.id, { questions: updatedQuestions });
                         alert('Question Bank updated successfully!');
                         setActiveTab('schedule');
                     }}
@@ -288,38 +275,54 @@ const TeacherGrades = () => {
             <Modal isOpen={showExamModal} onClose={() => setShowExamModal(false)} title="Schedule New Exam">
                 <form className="space-y-4" onSubmit={(e) => {
                     e.preventDefault();
+
+                    const form = e.target;
+                    const newExam = {
+                        name: form.elements.title.value,
+                        type: form.elements.type.value,
+                        duration: form.elements.duration.value,
+                        class: form.elements.class.value,
+                        date: form.elements.date.value,
+                        subject: selectedSubject,
+                        program: 'Western', // Default for now
+                        status: 'Scheduled',
+                        visibility: 'immediate',
+                        questions: []
+                    };
+
+                    addExam(newExam);
                     setShowExamModal(false);
                     alert('Exam scheduled successfully!');
                     // In real app, this would add to the exams list
                 }}>
                     <div>
                         <label className="block text-sm font-bold text-brown-700 mb-1">Exam Title</label>
-                        <input className="w-full p-3 border border-brown-200 rounded-xl outline-none focus:ring-2 focus:ring-primary/20" placeholder="e.g. Second Term Test" required />
+                        <input name="title" className="w-full p-3 border border-brown-200 rounded-xl outline-none focus:ring-2 focus:ring-primary/20" placeholder="e.g. Second Term Test" required />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-bold text-brown-700 mb-1">Type</label>
-                            <select className="w-full p-3 bg-white border border-brown-200 rounded-xl outline-none focus:ring-2 focus:ring-primary/20">
+                            <select name="type" className="w-full p-3 bg-white border border-brown-200 rounded-xl outline-none focus:ring-2 focus:ring-primary/20">
                                 <option value="CBT">CBT (Auto-Marked)</option>
                                 <option value="Theory">Theory (Manual)</option>
                             </select>
                         </div>
                         <div>
                             <label className="block text-sm font-bold text-brown-700 mb-1">Duration (Mins)</label>
-                            <input type="number" className="w-full p-3 border border-brown-200 rounded-xl outline-none focus:ring-2 focus:ring-primary/20" defaultValue="40" />
+                            <input name="duration" type="number" className="w-full p-3 border border-brown-200 rounded-xl outline-none focus:ring-2 focus:ring-primary/20" defaultValue="40" />
                         </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-bold text-brown-700 mb-1">Class</label>
-                            <select className="w-full p-3 bg-white border border-brown-200 rounded-xl outline-none focus:ring-2 focus:ring-primary/20">
+                            <select name="class" className="w-full p-3 bg-white border border-brown-200 rounded-xl outline-none focus:ring-2 focus:ring-primary/20">
                                 <option>JSS 1</option>
                                 <option>JSS 2</option>
                             </select>
                         </div>
                         <div>
                             <label className="block text-sm font-bold text-brown-700 mb-1">Date</label>
-                            <input type="date" className="w-full p-3 border border-brown-200 rounded-xl outline-none focus:ring-2 focus:ring-primary/20" />
+                            <input name="date" type="date" className="w-full p-3 border border-brown-200 rounded-xl outline-none focus:ring-2 focus:ring-primary/20" />
                         </div>
                     </div>
                     <button type="submit" className="w-full bg-primary text-white py-3 rounded-xl font-bold shadow-lg hover:bg-primary-dark transition-all mt-2">

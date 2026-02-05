@@ -41,107 +41,110 @@ import Placeholder from './components/Placeholder';
 import ProtectedRoute from './components/ProtectedRoute';
 import CbtExam from './pages/student/CbtExam';
 import { AuthProvider } from './context/AuthContext';
+import { ExamProvider } from './context/ExamContext';
 
 function App() {
   return (
     <AuthProvider>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
+      <ExamProvider>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
 
-        {/* Admin Routes */}
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute allowedRoles={['admin']}>
-              <DashboardLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<AdminDashboard />} />
-          <Route path="students" element={<StudentList />} />
-          <Route path="teachers" element={<TeacherList />} />
-          <Route path="parents" element={<ParentList />} />
-          <Route path="classes" element={<ClassList />} />
-          <Route path="subjects" element={<SubjectList />} />
-          <Route path="attendance" element={<AttendanceManagement />} />
-          <Route path="exams" element={<ExamManagement />} />
-          <Route path="fees" element={<FeesManagement />} />
-          <Route path="announcements" element={<Announcements />} />
-          <Route path="reports" element={<Reports />} />
-          <Route path="settings" element={<Settings />} />
-          <Route path="*" element={<Placeholder />} />
-        </Route>
+          {/* Admin Routes */}
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <DashboardLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<AdminDashboard />} />
+            <Route path="students" element={<StudentList />} />
+            <Route path="teachers" element={<TeacherList />} />
+            <Route path="parents" element={<ParentList />} />
+            <Route path="classes" element={<ClassList />} />
+            <Route path="subjects" element={<SubjectList />} />
+            <Route path="attendance" element={<AttendanceManagement />} />
+            <Route path="exams" element={<ExamManagement />} />
+            <Route path="fees" element={<FeesManagement />} />
+            <Route path="announcements" element={<Announcements />} />
+            <Route path="reports" element={<Reports />} />
+            <Route path="settings" element={<Settings />} />
+            <Route path="*" element={<Placeholder />} />
+          </Route>
 
-        {/* Teacher Routes */}
-        <Route
-          path="/teacher"
-          element={
-            <ProtectedRoute allowedRoles={['teacher']}>
-              <DashboardLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<TeacherDashboard />} />
-          <Route path="classes" element={<TeacherClasses />} />
-          <Route path="attendance" element={<TeacherAttendance />} />
-          <Route path="grades" element={<TeacherGrades />} />
-          <Route path="assignments" element={<TeacherAssignments />} />
-          <Route path="timetable" element={<TeacherTimetable />} />
-          <Route path="messages" element={<TeacherMessages />} />
-          <Route path="announcements" element={<TeacherAnnouncements />} />
-          <Route path="*" element={<Placeholder />} />
-        </Route>
+          {/* Teacher Routes */}
+          <Route
+            path="/teacher"
+            element={
+              <ProtectedRoute allowedRoles={['teacher']}>
+                <DashboardLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<TeacherDashboard />} />
+            <Route path="classes" element={<TeacherClasses />} />
+            <Route path="attendance" element={<TeacherAttendance />} />
+            <Route path="grades" element={<TeacherGrades />} />
+            <Route path="assignments" element={<TeacherAssignments />} />
+            <Route path="timetable" element={<TeacherTimetable />} />
+            <Route path="messages" element={<TeacherMessages />} />
+            <Route path="announcements" element={<TeacherAnnouncements />} />
+            <Route path="*" element={<Placeholder />} />
+          </Route>
 
-        {/* Student Routes */}
-        <Route
-          path="/student"
-          element={
-            <ProtectedRoute allowedRoles={['student']}>
-              <DashboardLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<StudentDashboard />} />
-          <Route path="grades" element={<StudentGrades />} />
-          <Route path="attendance" element={<StudentAttendance />} />
-          <Route path="timetable" element={<StudentTimetable />} />
-          <Route path="assignments" element={<StudentAssignments />} />
-          <Route path="materials" element={<StudentMaterials />} />
-          <Route path="announcements" element={<StudentAnnouncements />} />
-          <Route path="reports" element={<StudentReports />} />
-          <Route path="cbt" element={<StudentCbtList />} />
-          <Route path="*" element={<Placeholder />} />
-        </Route>
+          {/* Student Routes */}
+          <Route
+            path="/student"
+            element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <DashboardLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<StudentDashboard />} />
+            <Route path="grades" element={<StudentGrades />} />
+            <Route path="attendance" element={<StudentAttendance />} />
+            <Route path="timetable" element={<StudentTimetable />} />
+            <Route path="assignments" element={<StudentAssignments />} />
+            <Route path="materials" element={<StudentMaterials />} />
+            <Route path="announcements" element={<StudentAnnouncements />} />
+            <Route path="reports" element={<StudentReports />} />
+            <Route path="cbt" element={<StudentCbtList />} />
+            <Route path="*" element={<Placeholder />} />
+          </Route>
 
-        {/* Parent Routes */}
-        <Route
-          path="/parent"
-          element={
-            <ProtectedRoute allowedRoles={['parent']}>
-              <DashboardLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<ParentDashboard />} />
-          <Route path="fees" element={<ParentFees />} />
-          <Route path="messages" element={<ParentMessages />} />
-          <Route path="announcements" element={<ParentAnnouncements />} />
-          <Route path="calendar" element={<ParentCalendar />} />
-          <Route path="*" element={<Placeholder />} />
-        </Route>
+          {/* Parent Routes */}
+          <Route
+            path="/parent"
+            element={
+              <ProtectedRoute allowedRoles={['parent']}>
+                <DashboardLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<ParentDashboard />} />
+            <Route path="fees" element={<ParentFees />} />
+            <Route path="messages" element={<ParentMessages />} />
+            <Route path="announcements" element={<ParentAnnouncements />} />
+            <Route path="calendar" element={<ParentCalendar />} />
+            <Route path="*" element={<Placeholder />} />
+          </Route>
 
-        {/* Distraction-free CBT Exam Route */}
-        <Route
-          path="/student/exam/:examId"
-          element={
-            <ProtectedRoute allowedRoles={['student']}>
-              <CbtExam />
-            </ProtectedRoute>
-          }
-        />
+          {/* Distraction-free CBT Exam Route */}
+          <Route
+            path="/student/exam/:examId"
+            element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <CbtExam />
+              </ProtectedRoute>
+            }
+          />
 
-      </Routes>
+        </Routes>
+      </ExamProvider>
     </AuthProvider>
   );
 }
